@@ -12,11 +12,11 @@ class HashMap {
         for (let i = 0; i < key.length; i++) {
             hashCode = (primeNumber * hashCode + key.charCodeAt(i));
         }
-        return hashCode % this.buckets.length;
+        return hashCode;
     }
 
     set(key, value) {
-        let index = this.hash(key);
+        let index = this.hash(key) % this.buckets.length;
         let bucket = this.buckets[index];
 
         for (var i = 0; i < bucket.length; i++) {
@@ -26,30 +26,30 @@ class HashMap {
                 return;
             }
         }
-        
+
         bucket.push([key, value]);
         this.size++;
 
         if (this.size / this.buckets.length > this.loadFactor) {
+            console.log("load: " + this.size/this.buckets.length);
             this.grow();
         }
     }
 
     grow() {
         const newBuckets = new Array(this.buckets.length * 2)
-            .fill(null)
-            .map(() => []);
+            .fill(null).map(() => []);
         this.buckets.forEach((bucket) => {
             bucket.forEach(([key, value]) => {
-            const index = this.hash(key) % newBuckets.length;
-            newBuckets[index].push([key, value]);
+                const index = this.hash(key) % newBuckets.length;
+                newBuckets[index].push([key, value]);
+            });
         });
-      });
       this.buckets = newBuckets;        
     }
 
     get(key) {
-        let index = this.hash(key);
+        let index = this.hash(key) % this.buckets.length;
         let bucket = this.buckets[index];
 
         for (var i  = 0; i < bucket.length; i++) {
@@ -62,7 +62,7 @@ class HashMap {
     }
 
     has(key) {
-        if (this.get(key)) {
+        if (this.get(key) !== null) {
             return true;
         } else {
             return false;
@@ -70,12 +70,12 @@ class HashMap {
     }
 
     remove(key) {
-        let index = this.hash(key);
+        let index = this.hash(key) % this.buckets.length;
         let bucket = this.buckets[index];
 
         for (let i = 0; i < bucket.length; i++) {
-            const [bucketKey] = bucket[i];
-            if (bucketKey === key) {
+            const [bucket_key] = bucket[i];
+            if (bucket_key === key) {
               bucket.splice(i, 1);
               this.size--;
               return true;
